@@ -1,24 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import Board from './components/Board/Board';
+import GameSettings from './components/Form/GameSettings';
+import { FormType } from './components/FormType';
 
 function App() {
+  const [formData, setFormData] = useState<FormType>({
+    size: 9,
+    animal: 'wolf', // Default value for the radio
+    animalCount: 3, // Default number of wolves/sheep
+  });
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className='flex-row'>
+    <div className='game-setting'>
+    <GameSettings formData={formData} setFormData={setFormData} />
+
+    </div>
+    <div id="app">
+     <Board size={formData.size} animal={formData.animal} animalCount={formData.animalCount}></Board>
+    </div>
     </div>
   );
 }
