@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import "./Board.css";
 import Tile from "../Tile/Tile";
 import { stat } from "fs";
+import ReactLoading from 'react-loading';
 
 interface BoardProps {
     size: number;
@@ -61,6 +62,7 @@ for(let i=0;i<8;i++){
 export default function Board({ size,animal,animalCount }: BoardProps) {
     const [pieces,setPieces]= useState<Pieces[]>([])
     const [stateSpaceNo,setStateSpaceNo]= useState(0)
+    const [loading,setLoading]= useState<Boolean>(false)
 
     const [gridX,setGridX]=useState(0);
     const [gridY,setGridY]=useState(0);
@@ -79,29 +81,32 @@ function generateScenario(input:Pieces[], size:number,animal:'wolf' | 'sheep',an
     console.log("Pieces",pieces)
     return {
         gridSize:size,
-        scenario:animal==="wolf"?1:2,
+       scenario:animal==="wolf"?0:1,
+      // scenario:0,
         solver:"",
         animalCount:animalCount,
-        initialPositions:input.map(({ x, y,image }) => {
-            return {
-                row:  size-1-y,
-                col:x,
-                type:image==="assets/images/player_wolf.png"?'w':'s'
-            }
+//         initialPositions:input.map(({ x, y,image }) => {
+//             return {
+//                 row:  size-1-y,
+//                 col:x,
+//                 type:image==="assets/images/player_wolf.png"?'w':'s'
+//             }
         
           
-    }
-)
+//     }
+// )
     };
 }
 
 const callBruteForceAPI = async () => {
+    setLoading(true)
     try {
         setActiveButton('BruteForce');
+        
         let body=generateScenario(pieces, size,animal,animalCount);
         body={...body,solver:"bruteforce"}
         console.log(body);
-        const response = await fetch('http://localhost:8080/api/wolf-sheep/solve-scenario', {
+        const response = await fetch('https://pure-coast-17015-3cd40f1d93b8.herokuapp.com/api/wolf-sheep/solve-scenario', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -136,17 +141,18 @@ const callBruteForceAPI = async () => {
     } catch (error) {
         console.error('Error with Brute Force API:', error);
     }
+    setLoading(false)
 };
 
 const callBacktrackingAPI = async () => {
-   
+    setLoading(true)
     try {
         setActiveButton('BackTracking');
         let body=generateScenario(pieces, size,animal,animalCount);
         body={...body,solver:"backtracking"}
         console.log(body);
 
-        const response = await fetch('http://localhost:8080/api/wolf-sheep/solve-scenario', {
+        const response = await fetch('https://pure-coast-17015-3cd40f1d93b8.herokuapp.com/api/wolf-sheep/solve-scenario', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -181,51 +187,53 @@ const callBacktrackingAPI = async () => {
     } catch (error) {
         console.error('Error with Backtracking API:', error);
     }
+    setLoading(false)
+
 };
 
-const callOptimalSolutionAPI = async () => {
+// const callOptimalSolutionAPI = async () => {
    
-    try {
-        setActiveButton('OptimalSolution');
-        let body=generateScenario(pieces, size,animal,animalCount);
-        body={...body,solver:"optimal"}
-        console.log(body);
+//     try {
+//         setActiveButton('OptimalSolution');
+//         let body=generateScenario(pieces, size,animal,animalCount);
+//         body={...body,solver:"optimal"}
+//         console.log(body);
 
-        const response = await fetch('http://localhost:8080/api/wolf-sheep/solve-scenario', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(body),
-        });
-        const data = await response.json();
-        const initialBoardState: Pieces[] = [];
+//         const response = await fetch('http://localhost:8080/api/wolf-sheep/solve-scenario', {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//             },
+//             body: JSON.stringify(body),
+//         });
+//         const data = await response.json();
+//         const initialBoardState: Pieces[] = [];
     
-    // Populate the board with sheep positions
-    data.sheep.forEach(([x, y] :[number, number]) => {
-        initialBoardState.push({
-            image: 'assets/images/player_sheep.png',
-            x:y,
-            y:size-1-x
-        });
-    });
+//     // Populate the board with sheep positions
+//     data.sheep.forEach(([x, y] :[number, number]) => {
+//         initialBoardState.push({
+//             image: 'assets/images/player_sheep.png',
+//             x:y,
+//             y:size-1-x
+//         });
+//     });
 
-    // Populate the board with wolf positions
-    data.wolves.forEach(([x, y]: [number, number]) => {
-        initialBoardState.push({
-            image: 'assets/images/player_wolf.png',
-            x:y,
-            y:size-1-x
-        });
-    });
-    setStateSpaceNo(data.state_space_explored)
-    // Update the state with the prepared board
-    setPieces(initialBoardState);
-        console.log('Backtracking API Response:', data);
-    } catch (error) {
-        console.error('Error with Backtracking API:', error);
-    }
-};
+//     // Populate the board with wolf positions
+//     data.wolves.forEach(([x, y]: [number, number]) => {
+//         initialBoardState.push({
+//             image: 'assets/images/player_wolf.png',
+//             x:y,
+//             y:size-1-x
+//         });
+//     });
+//     setStateSpaceNo(data.state_space_explored)
+//     // Update the state with the prepared board
+//     setPieces(initialBoardState);
+//         console.log('Backtracking API Response:', data);
+//     } catch (error) {
+//         console.error('Error with Backtracking API:', error);
+//     }
+// };
 
 const output = generateScenario(pieces, size,animal,animalCount);
     console.log("Converted Coordinates :",JSON.stringify(output, null, 2));
@@ -250,6 +258,7 @@ const output = generateScenario(pieces, size,animal,animalCount);
     }
     
     setPieces(initialBoardState)
+    setActiveButton(null)
    },[size,animalCount,animal])
    
 
@@ -350,7 +359,7 @@ function dropPiece(e:React.MouseEvent){
            
         }
     }
-
+    if(!loading)
     return (
         <div>
              <div className="flex flex-row space-x-2 my-2 ">
@@ -384,7 +393,7 @@ function dropPiece(e:React.MouseEvent){
                 >
                     Back Tracking
                 </button>
-                <button
+                {/* <button
                     type="button"
                     className={`w-full py-2 px-4 rounded-md ${
                         activeButton === 'OptimalSolution'
@@ -398,7 +407,7 @@ function dropPiece(e:React.MouseEvent){
                     onClick={callOptimalSolutionAPI}
                 >
                     Optimal Solution
-                </button>
+                </button> */}
             </div>
         <div
             id="chessboard"
@@ -411,13 +420,16 @@ function dropPiece(e:React.MouseEvent){
             {board}
         </div>
 
-        <div className="rounded-lg overflow-hidden shadow-xl bg-gradient-to-r from-indigo-500 to-purple-600 p-6 my-5">
-    <div className="font-bold text-2xl text-white mb-4">
-        The number of State Space Graphs Generated:
+        {activeButton &&     <div className="rounded-lg overflow-hidden shadow-xl bg-gradient-to-r from-indigo-500 to-purple-600 p-6 my-5">
+   <div className="font-bold text-2xl text-white mb-4">
+        The number of states generated :
         <span className="text-yellow-300 font-extrabold"> {stateSpaceNo} </span>
     </div>
     
-</div>
+</div>}
         </div>
     );
+    else {
+        return (<> <ReactLoading type={'spinningBubbles'} color={'#8643ea'} height={667} width={375} /></>)
+    }
 }
