@@ -199,7 +199,7 @@ const callBacktrackingAPI = async () => {
     setPieces(initialBoardState);
         console.log('Backtracking API Response:', data);
     } catch (error) {
-        console.error('Error with Backtracking API:', error);
+        console.error('Error with Backtracking API and eoe:', error);
     }
     setLoading(false)
 
