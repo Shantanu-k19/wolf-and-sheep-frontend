@@ -50,7 +50,7 @@ jobs:
       - run:
           name: Deploy to EC2
           command: |
-            ssh -o StrictHostKeyChecking=no ubuntu@54.88.72.192 << 'EOF'
+            ssh -o StrictHostKeyChecking=no ubuntu@54.88.72.192 \<< 'EOF'
               cd /home/ubuntu/react-app
               git pull origin main
               npm install
