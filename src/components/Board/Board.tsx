@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./Board.css";
 import Tile from "../Tile/Tile";
-import { stat } from "fs";
 import ReactLoading from 'react-loading';
 
 interface BoardProps {
