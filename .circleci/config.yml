@@ -3,7 +3,7 @@ version: 2.1
 executors:
   node-executor:
     docker:
-      - image: cimg/node:18.17  # Use a Node.js image
+      - image: cimg/node:18.17
 
 jobs:
   install:
@@ -38,12 +38,37 @@ jobs:
           paths:
             - build
 
+  deploy:
+    executor: node-executor
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - add_ssh_keys:
+          fingerprints:
+            - "SHA256:oXdNTQu+3Ip+GvuorqLi06FWWJdJMG+5nn4rcCZ+WMY"
+      - run:
+          name: Deploy to EC2
+          command: |
+            ssh -o StrictHostKeyChecking=no ubuntu@54.88.72.192 << 'EOF'
+              cd /home/ubuntu/react-app
+              git pull origin main
+              npm install
+              npm run build
+              pm2 restart all || pm2 start npm --name "react-app" -- start
+            EOF
+
 workflows:
   version: 2
-  build-and-test:
+  build-and-deploy:
     jobs:
       - install
-      
+      - test:
+          requires:
+            - install
       - build:
           requires:
             - install
+      - deploy:
+          requires:
+            - build
