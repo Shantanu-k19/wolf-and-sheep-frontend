@@ -106,7 +106,14 @@ const callBruteForceAPI = async () => {
         let body=generateScenario(pieces, size,animal,animalCount);
         body={...body,solver:"bruteforce"}
         console.log(body);
-        const response = await fetch('https://pure-coast-17015-3cd40f1d93b8.herokuapp.com/api/wolf-sheep/solve-scenario', {
+        // const response = await fetch('https://pure-coast-17015-3cd40f1d93b8.herokuapp.com/api/wolf-sheep/solve-scenario', {
+        //     method: 'POST',
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //     },
+        //     body: JSON.stringify(body),
+        // });
+        const response = await fetch('http://localhost:8080/api/wolf-sheep/solve-scenario', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -152,7 +159,14 @@ const callBacktrackingAPI = async () => {
         body={...body,solver:"backtracking"}
         console.log(body);
 
-        const response = await fetch('https://pure-coast-17015-3cd40f1d93b8.herokuapp.com/api/wolf-sheep/solve-scenario', {
+        // const response = await fetch('https://pure-coast-17015-3cd40f1d93b8.herokuapp.com/api/wolf-sheep/solve-scenario', {
+        //     method: 'POST',
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //     },
+        //     body: JSON.stringify(body),
+        // });
+        const response = await fetch('http://localhost:8080/api/wolf-sheep/solve-scenario', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
